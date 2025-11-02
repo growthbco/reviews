@@ -9,6 +9,22 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.15.3"
+    "@astrojs/react": "^4.4.1",
+    "@netlify/functions": "^5.0.1",
+    "@prisma/client": "^6.18.0",
+    "@tailwindcss/vite": "^4.1.16",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "astro": "^5.15.3",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.552.0",
+    "prisma": "^6.18.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "recharts": "^3.3.0",
+    "tailwindcss": "^4.1.16"
   }
 }

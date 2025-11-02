@@ -1,0 +1,77 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import SentimentForm from '../../components/SentimentForm';
+import { prisma } from '../../lib/db';
+
+const { cardId } = Astro.params;
+
+if (!cardId) {
+  return Astro.redirect('/');
+}
+
+// Fetch card and business data
+let card, business, profile;
+
+try {
+  card = await prisma.card.findUnique({
+    where: { uniqueId: cardId },
+    include: {
+      business: true,
+      googleBusinessProfile: true,
+    },
+  });
+
+  if (!card) {
+    return Astro.redirect('/');
+  }
+
+  business = card.business;
+  profile = card.googleBusinessProfile;
+
+  // Note: Scan will be logged client-side when the form loads
+  // This ensures we have a scanId before sentiment check
+} catch (error) {
+  console.error('Error fetching card:', error);
+  return Astro.redirect('/');
+}
+
+const settings = (profile.settings as { headerText?: string; instructionsText?: string; darkMode?: boolean }) || {};
+---
+
+<DashboardLayout title={`Leave a Review - ${business.name}`}>
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
+      {profile.logo && (
+        <div class="flex justify-center">
+          <img src={profile.logo} alt={profile.businessName} class="h-20 w-auto object-contain" />
+        </div>
+      )}
+      
+      <div class="text-center space-y-2">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          {profile.businessName || business.name}
+        </h1>
+        {settings.headerText && (
+          <p class="text-gray-600 dark:text-gray-300 text-sm">
+            {settings.headerText}
+          </p>
+        )}
+      </div>
+
+      {settings.instructionsText && (
+        <p class="text-gray-700 dark:text-gray-200 text-sm text-center">
+          {settings.instructionsText}
+        </p>
+      )}
+
+      <div class="pt-4">
+        <SentimentForm 
+          cardId={card.id}
+          googleReviewUrl={profile.googleReviewUrl}
+          client:load
+        />
+      </div>
+    </div>
+  </main>
+</DashboardLayout>
+

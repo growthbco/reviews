@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Business {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  createdAt DateTime @default(now())
+  
+  profiles GoogleBusinessProfile[]
+  cards     Card[]
+  
+  @@index([userId])
+}
+
+model GoogleBusinessProfile {
+  id             String   @id @default(cuid())
+  businessId     String
+  profileName    String
+  googleReviewUrl String
+  businessName   String
+  logo           String?
+  settings       Json?    // Custom settings (header text, instructions, dark mode, etc.)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  cards    Card[]
+  
+  @@index([businessId])
+}
+
+model Card {
+  id                      String   @id @default(cuid())
+  businessId              String
+  googleBusinessProfileId String
+  name                    String
+  uniqueId                String   @unique
+  qrCode                  String?  // QR code image data or URL
+  status                  String   @default("active") // active | inactive
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  
+  business              Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  googleBusinessProfile GoogleBusinessProfile @relation(fields: [googleBusinessProfileId], references: [id], onDelete: Cascade)
+  scans                 Scan[]
+  
+  @@index([businessId])
+  @@index([googleBusinessProfileId])
+  @@index([uniqueId])
+}
+
+model Scan {
+  id        String   @id @default(cuid())
+  cardId    String
+  scanType  String   // nfc | qr
+  timestamp DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  
+  card              Card            @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  sentimentChecks   SentimentCheck[]
+  reviewRedirects   ReviewRedirect[]
+  
+  @@index([cardId])
+  @@index([timestamp])
+}
+
+model SentimentCheck {
+  id             String   @id @default(cuid())
+  cardId         String
+  scanId         String
+  sentiment      String   // positive | negative | neutral
+  sentimentScore Float    // 0.0 to 1.0
+  feedback       String
+  allowed        Boolean  // Whether user was allowed to proceed
+  timestamp      DateTime @default(now())
+  
+  scan Scan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  
+  @@index([cardId])
+  @@index([scanId])
+  @@index([timestamp])
+}
+
+model ReviewRedirect {
+  id         String   @id @default(cuid())
+  cardId     String
+  scanId     String
+  timestamp  DateTime @default(now())
+  successful Boolean  @default(true)
+  
+  scan Scan @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  
+  @@index([cardId])
+  @@index([scanId])
+  @@index([timestamp])
+}

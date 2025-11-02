@@ -1,0 +1,38 @@
+---
+import DashboardLayout from '../../layouts/DashboardLayout.astro';
+import SentimentForm from '../../components/SentimentForm';
+---
+
+<DashboardLayout title="Leave a Review - Demo Business">
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 space-y-6">
+      <div class="flex justify-center">
+        <div class="h-20 w-20 bg-blue-600 rounded-lg flex items-center justify-center">
+          <span class="text-white text-2xl font-bold">D</span>
+        </div>
+      </div>
+      
+      <div class="text-center space-y-2">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          Demo Business
+        </h1>
+        <p class="text-gray-600 dark:text-gray-300 text-sm">
+          We'd love your feedback! Your opinion helps our small local business grow and reach our goal of 2 new reviews each day.
+        </p>
+      </div>
+
+      <p class="text-gray-700 dark:text-gray-200 text-sm text-center">
+        Please share your experience with us.
+      </p>
+
+      <div class="pt-4">
+        <SentimentForm 
+          cardId="demo-card-id"
+          googleReviewUrl="https://g.page/r/CcQuC91RfHgYEBM/review"
+          client:load
+        />
+      </div>
+    </div>
+  </main>
+</DashboardLayout>
+
